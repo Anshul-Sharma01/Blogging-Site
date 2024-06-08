@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 const userSchema = new Schema({
-    Username : {
+    username : {
         type : String,
         required : [true, 'Username is required'],
         unique:[true,'Username already exists'],
@@ -16,8 +16,6 @@ const userSchema = new Schema({
     name: {
         type:String,
         trim : true,
-        minLength:[3,'Name must be alteast 5 characters'],
-        maxLength :[10, 'Name must be less than 10 characters']
     },
     email : {
         type:String,
