@@ -21,11 +21,11 @@ const register = async(req, res, next) => {
     }
 
     const emailExists = await User.findOne({email});
-    if(emailExists){
+    if(!emailExists){
         return next(new AppError('Email already exists',400));
     }
     const unameExists = await User.findOne({username});
-    if(unameExists){
+    if(!unameExists){
         return next(new AppError('Username already exists', 400));
     }
 
