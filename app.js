@@ -17,11 +17,13 @@ app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
+
 app.get("/api/v1/user/ping", (req, res) => {
     res.send("/pong");
 })
 
 app.use('/api/v1/user', userRoutes);
+
 
 
 app.all("*",(req,res) => {
