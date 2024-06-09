@@ -5,6 +5,7 @@ import userRoutes from './routes/user.routes.js';
 
 
 import { config } from 'dotenv';
+import errorMiddleware from './middlewares/error.middleware.js';
 config();
 
 
@@ -29,6 +30,8 @@ app.use('/api/v1/user', userRoutes);
 app.all("*",(req,res) => {
     res.status(400).send('OOPS !! 404 Page not found');
 })
+
+app.use(errorMiddleware);
 
 
 export default app;

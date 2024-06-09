@@ -62,7 +62,7 @@ userSchema.pre('save',async function(next) {
 
 userSchema.methods = {
     generateJwtToken : async function(){
-        return await jwt.sign(
+        return jwt.sign(
             {
                 id : this._id,
                 role : this.role,
