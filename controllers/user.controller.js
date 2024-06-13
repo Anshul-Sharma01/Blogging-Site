@@ -8,8 +8,8 @@ import sendEmail from '../utils/sendEmail.utils.js';
 
 const cookieOptions = {
     maxAge : 7 * 24 * 60 * 60 * 1000,
-    httpOnly : true,
-    secure : true
+    secure : true,
+    httpOnly:true
 }
 
 
@@ -21,11 +21,11 @@ const register = async(req, res, next) => {
     }
 
     const emailExists = await User.findOne({email});
-    if(!emailExists){
+    if(emailExists){
         return next(new AppError('Email already exists',400));
     }
     const unameExists = await User.findOne({username});
-    if(!unameExists){
+    if(unameExists){
         return next(new AppError('Username already exists', 400));
     }
 
@@ -61,7 +61,7 @@ const register = async(req, res, next) => {
             return next(new AppError(err.message || "File not uploaded, please try again",500));
         }
     }
-    const token = await user.generateJwtToken();
+    const token = await user.generateJWTToken();
     res.cookie('token', token, cookieOptions);
 
     await user.save();
@@ -88,7 +88,8 @@ const login = async(req, res, next) => {
             return next(new AppError("Email or password does not match",400));
         }
 
-        const token = await user.generateJwtToken();
+        const token = await user.generateJWTToken();
+        // console.log("token at login :" ,token);
         user.password = undefined;
 
         res.cookie('token', token, cookieOptions);
