@@ -5,6 +5,7 @@ import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
 import upload from "../middlewares/multer.middleware.js";
 import { appendFile } from "fs";
+import { publicEncrypt } from "crypto";
 
 
 const viewAllBlogs = async (req, res, next) => {
@@ -103,13 +104,88 @@ const createblog = async (req, res, next) => {
     }
 };
 
-const updateblog = async(req, res, next) => {
+const updateblog = async (req, res, next) => {
+    const { id } = req.params;
+    const { title, content } = req.body;
 
-} 
+    const OldBlog = await Blog.findById(id);
+    if (!OldBlog) {
+        return next(new AppError(`Blog not found with id ${id}`, 404));
+    }
+    
+
+    let newpublic_id = null;
+    let newsecure_url = null;
+
+    const oldpublic_id = OldBlog.thumbnail.public_id.split('/')[1];
+    console.log(oldpublic_id);
+    if (req.file) {
+        console.log("New Thumbnail Received");
+        try {
+            const result = await cloudinary.v2.uploader.upload(req.file.path, {
+            public_id: oldpublic_id,
+            invalidate: true,
+            overwrite: true,
+            folder: "blogging_site",
+            width: 450,
+            height: 450,
+            gravity: "auto",
+            crop: "fill",
+        });
+
+        if (result) {
+                newpublic_id = result.public_id;
+                newsecure_url = result.secure_url;
+
+                fs.rm(`uploads/${req.file.filename}`);
+            }
+        } catch (err) {
+            return next(new AppError(`Thumbnail not updated : ${err.message}`, 401));
+        }
+    }
+
+    const updatedblog = await Blog.findByIdAndUpdate(
+        id,
+        { title, content, thumbnail: { public_id: newpublic_id, secure_url: newsecure_url } },
+        {
+            sort: { updatedAt: -1 },
+            projection: { title: 1, content: 1, thumbnail: 1 },
+        }
+    );
+
+    await updatedblog.save();
+    res.status(200).json({
+        success: true,
+        message: "blog updated successfully",
+        blog: {title, content, thumbnail : {public_id : newpublic_id, secure_url : newsecure_url}},
+    });
+};
 
 
 const deleteblog = async(req, res, next) => {
+    const { id } = req.params;
+    try{
+        const deletedBlog = await Blog.findByIdAndDelete(id);
 
+        if(!deletedBlog){
+            return next(new AppError(`Blog is not deleted, please try again : ${err.message}`, 401));
+        }
+
+        const public_id = deletedBlog.thumbnail.public_id; // assuming you have a thumbnailPublicId field in your Blog model
+        await cloudinary.v2.api.delete_resources([public_id], { all: true });
+        console.log(`The thumbnail is deleted`);
+
+
+        res.status(200).json({
+            success:true,
+            message:'Blog successfully deleted',
+            deletedBlog
+        })
+
+
+    }catch(err){
+        return next(new AppError(`Error occurred while deleting the specific blog, please try again : ${err.message}`, 401));
+    }
 }
 
 

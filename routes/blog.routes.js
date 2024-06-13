@@ -9,7 +9,7 @@ const router = Router();
 router.get('/view', isLoggedIn, viewAllBlogs);
 router.get('/viewmyblogs', isLoggedIn, viewPersonalBlogs);
 router.post('/createblog', isLoggedIn, upload.single('thumbnail'), createblog);
-router.post('/updateblog/:id', isLoggedIn, updateblog);
+router.post('/updateblog/:id', isLoggedIn, upload.single('thumbnail'),  updateblog);
 router.get('/deleteblog/:id', isLoggedIn, authorizedRole('ADMIN'), deleteblog);
 
 
