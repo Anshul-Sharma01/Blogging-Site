@@ -4,7 +4,7 @@ import AppError from '../utils/error.utils.js';
 import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
 import sendEmail from '../utils/sendEmail.utils.js';
-
+import crypto from 'crypto';
 
 const cookieOptions = {
     maxAge : 7 * 24 * 60 * 60 * 1000,
@@ -84,7 +84,7 @@ const login = async(req, res, next) => {
             email
         }).select('+password');
 
-        if(!user || !user.comparePassword(password)){
+        if(!(user && (await user.comparePassword(password)))){
             return next(new AppError("Email or password does not match",400));
         }
 
@@ -146,11 +146,12 @@ const forgotPassword = async(req, res, next) => {
     const resetToken = await user.generatePasswordResetToken();
 
     await user.save();
-    const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password`;
+    const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset/${resetToken}`;
 
-    const message = `You can reset your password by clicking <a href=${resetPassword} target="_blank"> Reset Your Password</a>.\nIf the above link does not work for some reason then copy paste this link in new tab ${resetPasswordUrl}.\nIf you have not requested this, kindly Ignore.`;
+    const subject = 'Reset Password';
+    const message = `You can reset your password by clicking <a href=${resetPasswordUrl} target="_blank"> Reset Your Password</a>.\nIf the above link does not work for some reason then copy paste this link in new tab ${resetPasswordUrl}.\nIf you have not requested this, kindly Ignore.`;
     try{
-        await sendEmail(email,  message);
+        await sendEmail(email, subject, message);
         res.status(200).json({
             success : true,
             message : `Reset Password token has been sent to ${email} successfully`
@@ -159,7 +160,9 @@ const forgotPassword = async(req, res, next) => {
     }catch(err){
         user.forgotPasswordExpiry = undefined;
         user.forgotPasswordToken = undefined;
-        return next(new AppError(e.message, 500));
+
+        await user.save();
+        return next(new AppError(err.message, 500));
     }
     
     
@@ -210,7 +213,7 @@ const changePassword = async(req, res, next) => {
         return next(new AppError('Invalid old Password',400));
     }
 
-    user.password = password;
+    user.password = newPassword;
     await user.save();
 
     user.password = undefined;
@@ -219,6 +222,7 @@ const changePassword = async(req, res, next) => {
         message : 'Password changed successfully'
     })
 }
+
 
 const updateUser = async(req, res, next) => {
     const { username } = req.body;
