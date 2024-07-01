@@ -149,7 +149,7 @@ const forgotPassword = async(req, res, next) => {
     const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset/${resetToken}`;
 
     const subject = 'Reset Password';
-    const message = `You can reset your password by clicking <a href=${resetPasswordUrl} target="_blank"> Reset Your Password</a>.\nIf the above link does not work for some reason then copy paste this link in new tab ${resetPasswordUrl}.\nIf you have not requested this, kindly Ignore.`;
+    const message = `You can reset your password by clicking <a href=${resetPasswordUrl} target="_blank" > Reset Your Password </a>.\nIf the above link does not work for some reason then copy paste this link in new tab ${resetPasswordUrl}.\nIf you have not requested this, kindly Ignore.`;
     try{
         await sendEmail(email, subject, message);
         res.status(200).json({
@@ -250,14 +250,14 @@ const updateUser = async(req, res, next) => {
             }) 
 
             if(result){
-                user.avatar.public_id = reset.public_id;
+                user.avatar.public_id = result.public_id;
                 user.avatar.secure_url = result.secure_url;
 
                 fs.rm(`uploads/${req.file.filename}`);
             }
 
         }catch(err){
-            return next(new AppError(e || 'File not uploaded, please try again'), 500);
+            return next(new AppError(e || 'File not uploaded, please try again',500) );
         }
 
         user.save();
