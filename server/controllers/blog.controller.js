@@ -10,15 +10,27 @@ import { publicEncrypt } from "crypto";
 
 const viewAllBlogs = async (req, res, next) => {
     try{
-        const allBlogs = await Blog.find({});
+        let { page, limit } = req.query;
+
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 3;
+
+        const skip = ( page - 1 ) * limit;
+
+        const allBlogs = await Blog.find({}).skip(skip).limit(limit);
         if(!allBlogs){
             return next(new AppError('Error occurred in fetching blogs or blogs might not exits', 400));
         }
 
+        const totalBlogs = await Blog.countDocuments();
+
         res.status(200).json({
             success : true,
             message : 'All Blogs fetched',
-            allBlogs
+            allBlogs,
+            totalBlogs,
+            totalPages : Math.ceil(totalBlogs / limit),
+            currentPage : page
         })
 
     }catch(err){
