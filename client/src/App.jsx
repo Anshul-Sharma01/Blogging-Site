@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom"
-import Home from "./Pages/Home"
-import Login from "./Pages/Login"
+import Home from "./Pages/Home.jsx"
+import LoginUser from "./Pages/LoginUser.jsx"
 
 function App() {
   
@@ -9,7 +9,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Home/>}/>
-        <Route path="/login" element={<Login/>}/>
+        <Route path="/login" element={<LoginUser/>}/>
       </Routes>
     </>
   )

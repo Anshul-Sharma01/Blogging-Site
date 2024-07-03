@@ -1,8 +1,26 @@
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FiMenu } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Logout } from "../Redux/Slices/AuthSlice.js";
 
 function HomeLayout({ children }){
+
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
+
+    const role = useSelector((state) => state?.auth?.role);
+
+    async function handleLogOut(e){
+        e.preventDefault();
+        const res = await dispatch(Logout());
+        if(res?.meta?.requestStatus === 'fulfilled'){
+            navigate("/login");
+        }
+    }
 
     function changeWidth(){
         const drawerSide = document.getElementsByClassName('drawer-side');
@@ -37,7 +55,30 @@ function HomeLayout({ children }){
                                 </button>
                             </li>
                             <li><Link to='/'> Home </Link></li>
-                            <li><Link to='/login'> Login </Link></li>
+                            {
+                                !isLoggedIn && (
+                                    <li className=" mt-4 w-full flex flex-col items-center">
+                                        <button className="btn btn-outline btn-primary px-4 py-1 font-semibold rounded-md w-full mb-2"> 
+                                            <Link to="/login"> LogIn </Link>
+                                        </button>
+                                        <button className="btn btn-outline btn-secondary px-4 py-1 font-semibold rounded-md w-full mb-2">
+                                            <Link to="/signup"> SingUp</Link>
+                                        </button>
+                                    </li>
+                                )
+                            }
+                            {
+                                isLoggedIn && (
+                                    <li>
+                                        <button>
+                                            <Link to="/user/profile"> Profile </Link>
+                                        </button>
+                                        <button onClick={handleLogOut} className="btn btn-outline btn-danger px-4 py-1 font-semibold rounded-md w-full mb-2">
+                                            LogOut
+                                        </button>
+                                    </li>
+                                )
+                            }
                         </ul>
                     </div>
                 </div>
