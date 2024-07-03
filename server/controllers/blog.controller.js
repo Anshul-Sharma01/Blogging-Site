@@ -60,7 +60,11 @@ const viewPersonalBlogs = async(req, res, next ) => {
         const totalBlogs = await Blog.countDocuments({ username }) ;
 
         if(myBlogs.length == 0){
-            return next(new AppError('Blogs doesnt exists',400));
+            res.status(200).json({
+                success : true,
+                message : 'Personal blogs doesnt exist',
+                
+            })
         }
 
         res.status(200).json({
