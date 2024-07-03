@@ -63,18 +63,20 @@ const viewPersonalBlogs = async(req, res, next ) => {
             res.status(200).json({
                 success : true,
                 message : 'Personal blogs doesnt exist',
-                
+
             })
+        }else{
+            res.status(200).json({
+                success : true,
+                message : 'Personal blogs fetched',
+                myBlogs,
+                totalBlogs,
+                totalPages : Math.ceil(totalBlogs / limit),
+                currentPage : page
+            })
+
         }
 
-        res.status(200).json({
-            success : true,
-            message : 'Personal blogs fetched',
-            myBlogs,
-            totalBlogs,
-            totalPages : Math.ceil(totalBlogs / limit),
-            currentPage : page
-        })
     }catch(err){
         return next(new AppError(`Failed to fetch personal blogs ${err.message}`,400));
     }
