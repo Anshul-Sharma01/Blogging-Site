@@ -42,12 +42,22 @@ const viewAllBlogs = async (req, res, next) => {
 const viewPersonalBlogs = async(req, res, next ) => {
     console.log(req.user);
     try{
+        let { page, limit } = req.query;
+
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 3;
+
+        const skip = ( page - 1) * limit;
+
         const username = req.user.username;
-        const myBlogs = await Blog.find({username});
+        const myBlogs = await Blog.find({username}).skip(skip).limit(limit);
+        
 
         if(!myBlogs){
             return next(new AppError("Error occurred in fetching personal blogs : ",400));
         }
+
+        const totalBlogs = await Blog.countDocuments({ username }) ;
 
         if(myBlogs.length == 0){
             return next(new AppError('Blogs doesnt exists',400));
@@ -56,7 +66,10 @@ const viewPersonalBlogs = async(req, res, next ) => {
         res.status(200).json({
             success : true,
             message : 'Personal blogs fetched',
-            myBlogs
+            myBlogs,
+            totalBlogs,
+            totalPages : Math.ceil(totalBlogs / limit),
+            currentPage : page
         })
     }catch(err){
         return next(new AppError(`Failed to fetch personal blogs ${err.message}`,400));
@@ -71,17 +84,9 @@ const createblog = async (req, res, next) => {
         if (!title || !content) {
             return next(new AppError('All fields are mandatory', 400));
         }
+        let secure_url, public_id;
 
-        const newBlog = await Blog.create({
-            username, title, content, thumbnail: {
-                public_id: username,
-                secure_url: 'Still not got url'
-            }
-        });
-
-        if (!newBlog) {
-            return next(new AppError('Blog Creation failed, please try again.', 400));
-        }
+        
 
         if (req.file) {
             try {
@@ -95,8 +100,8 @@ const createblog = async (req, res, next) => {
                 });
 
                 if (result) {
-                    newBlog.thumbnail.public_id = result.public_id;
-                    newBlog.thumbnail.secure_url = result.secure_url;
+                    public_id = result.public_id;
+                    secure_url = result.secure_url;
 
                     fs.rm(`uploads/${req.file.filename}`);
                 }
@@ -105,12 +110,23 @@ const createblog = async (req, res, next) => {
             }
         }
 
+        const newBlog = await Blog.create({
+            username, title, content, thumbnail: {
+                public_id, secure_url
+            }
+        });
+
+        if (!newBlog) {
+            return next(new AppError('Blog Creation failed, please try again.', 400));
+        }
+
         await newBlog.save();
         res.status(200).json({
             success:true,
             message:"Blog successfully created",
             newBlog
         })
+
     } catch (err) {
         return next(new AppError(`Some Error occurred while creating blog...Please try again after some time. : ${err.message}`, 400));
     }

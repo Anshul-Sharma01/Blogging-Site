@@ -1,5 +1,6 @@
 
 import User from '../models/user.model.js';
+import Blog from '../models/blog.model.js';
 import AppError from '../utils/error.utils.js';
 import cloudinary from 'cloudinary';
 import fs from 'fs/promises';
@@ -29,16 +30,8 @@ const register = async(req, res, next) => {
         return next(new AppError('Username already exists', 400));
     }
 
-    const user = await User.create({
-        username, name, email, password, avatar: {
-            public_id : email,
-            secure_url : "Still not get url"
-        }
-    });
-
-    if(!user){
-        return next(new AppError("User registration failed, pleae try again", 400));
-    }
+    let public_id, secure_url;
+    
 
     if(req.file){
         console.log("Profile pic received");
@@ -52,8 +45,8 @@ const register = async(req, res, next) => {
             })
 
             if(result){
-                user.avatar.public_id = result.public_id;
-                user.avatar.secure_url = result.secure_url;
+                public_id = result.public_id;
+                secure_url = result.secure_url;
 
                 fs.rm(`uploads/${req.file.filename}`);
             }
@@ -61,6 +54,17 @@ const register = async(req, res, next) => {
             return next(new AppError(err.message || "File not uploaded, please try again",500));
         }
     }
+
+    const user = await User.create({
+        username, name, email, password, avatar: {
+            public_id, secure_url 
+        }
+    });
+
+    if(!user){
+        return next(new AppError("User registration failed, pleae try again", 400));
+    }
+
     const token = await user.generateJWTToken();
     res.cookie('token', token, cookieOptions);
 
@@ -270,6 +274,49 @@ const updateUser = async(req, res, next) => {
 
 }
 
+const deleteUser = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+
+        const deletedUser = await User.findByIdAndDelete(userId);
+
+        if (!deletedUser) {
+            return next(new AppError('User not found, please try again', 400));
+        }
+
+        const public_id = deletedUser.avatar.public_id;
+
+        if (public_id) {
+            try {
+                await cloudinary.v2.api.delete_resources([public_id], { all: true });
+                console.log('The user avatar is deleted');
+            } catch (err) {
+                console.log('Error deleting avatar:', err.message);
+                return next(new AppError('Error deleting user avatar, please try again', 500));
+            }
+        }
+
+        const deletedBlogs = await Blog.deleteMany({ username: deletedUser.username });
+
+        res.status(200).json({
+            success: true,
+            message: 'User and the user blogs are deleted',
+            user: deletedUser,
+            blogs: deletedBlogs
+        });
+
+    } catch (err) {
+        console.log('Error in deleteUser:', err.message);
+        return next(new AppError(`Error occurred in deleting the user, please try again: ${err.message}`, 500));
+    }
+};
+
+
+const addNewUser = async(req, res, next) => {
+
+}
+
+
 
 export{
     register,
@@ -279,5 +326,7 @@ export{
     forgotPassword,
     resetPassword,
     changePassword,
-    updateUser
+    updateUser,
+    deleteUser,
+    addNewUser
 }
