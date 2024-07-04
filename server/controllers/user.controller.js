@@ -229,7 +229,7 @@ const changePassword = async(req, res, next) => {
 
 
 const updateUser = async(req, res, next) => {
-    const { username } = req.body;
+    const { name } = req.body;
     const { id } = req.user.id;
 
     const user = await User.findById(id);
@@ -238,8 +238,8 @@ const updateUser = async(req, res, next) => {
         return next(new AppError('User does not exists',400));
     }
 
-    if(req.username){
-        user.username = username;
+    if(req.name){
+        user.name = name;
     }
 
     if(req.file){

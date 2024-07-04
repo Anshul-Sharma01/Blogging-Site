@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import axiosInstance from "../../Helpers/axiosInstance";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 
 const initialState = {
@@ -11,53 +12,41 @@ const initialState = {
 
 
 export const createAccount = createAsyncThunk("/auth/signup", async(data) => {
-    try{
-        const result = axiosInstance.post("user/register", data);
-        toast.promise(res, {
-            loading : 'Creating Your Account !!',
-            success : (data) => {
-                return data?.data?.message;
-            },
-            error : 'Failed to Create Account, Please try again...'
-        })
-        return (await res).data;
-    }catch(err){
-        toast.error(err?.response?.data?.message);
-    }
+    const res = axiosInstance.post('user/register', data);
+    await toast.promise(res, {
+        loading : 'Creating your account',
+        success : (data) => {
+            return data?.data?.message;
+        },
+        error : (err) => err?.response?.data?.message || 'Failed to Create Account, Please Try again..'
+    })
+    return (await res).data;
 })
 
 
 export const Login = createAsyncThunk('/auth/login', async(data) => {
-    try{
-        const res = axiosInstance.post("user/login", data);
-        toast.promise(res, {
-            loading : 'Authenticating your credentials',
-            success : (data) => {
-                return data?.data?.message;
-            },
-            error : 'Failed to Login'
-        });
-        return (await res).data;
-    }catch(err){
-        toast.error(err?.response?.data?.message);
-    }
+    const res = axiosInstance.post('user/login', data);
+    await toast.promise(res,{
+        loading : 'Authenticating your credentials',
+        success : (data) => {
+            return data?.data?.message;
+        },
+        error : (err) => err?.response?.data?.message || 'Failed to Login'
+    });
+    return (await res).data;
 })
 
-export const Logout = createAsyncThunk('/auth/logout', async(req, res) => {
-    try{
-        const res = axiosInstance.get("user/logout");
-        toast.promise(res, {
-            loading : 'Logout in progress..',
-            success : (data) => {
-                return data?.data?.message;
-            },
-            error :'Failed to LogOut'
-        })
-        return (await res).data;
-    }catch(err){
-        toast.error(err?.response?.data?.message);
-    }
-})
+export const Logout = createAsyncThunk('/auth/logout', async () => {
+    const res = axiosInstance.get("user/logout");
+    await toast.promise(res, {
+        loading: 'Logout in progress..',
+        success: (data) => {
+            return data?.data?.message;
+        },
+        error: (err) => err?.response?.data?.message || 'Failed to LogOut'
+    });
+    return (await res).data;
+});
 
 const authSlice = createSlice({
     name : 'auth',
