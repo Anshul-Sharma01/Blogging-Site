@@ -2,28 +2,26 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../Helpers/axiosInstance";
 import HomeLayout from "../Layouts/HomeLayout";
 import toast from "react-hot-toast";
-import { MdOutlineFileUpload } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 function ProfilePage() {
     const [detailsFetched, setDetailsFetched] = useState(false);
     const [details, setDetails] = useState({});
 
-    async function getProfile() {
-        try {
-            const res = axiosInstance.get("/user/me");
-            await toast.promise(res, {
-                loading: 'Fetching Profile Details',
-                success: (data) => {
-                    setDetails(data?.data?.user);
-                    return 'Profile data successfully fetched';
-                },
-                error: 'Failed to Fetch Profile details, please try again'
-            });
-            setDetailsFetched(true);
-        } catch (error) {
-            setDetailsFetched(false);
-        }
+    function getProfile(){
+        const res = axiosInstance.get("/user/me");
+        toast.promise(res,{
+            loading : 'Fetching Profile Details',
+            success : (data) => {
+                setDetails(data?.data?.user);
+                return 'Profile Successfully Fetched'
+            },
+            error : 'Failed to Fetch Profile'
+        })
+        setDetailsFetched(true);
     }
+
+
 
     useEffect(() => {
         getProfile();
@@ -35,36 +33,30 @@ function ProfilePage() {
                 <h1 className="text-4xl font-bold">User Details</h1>
                 <br />
                 {detailsFetched && (
-                    <form className="flex flex-col gap-4 shadow-lg">
-                                                <div className="avatar flex flex-col justify-center items-center relative">
-                            <div className="rounded-full w-56 relative group">
+                    <form className="flex flex-col gap-4 shadow-lg p-10 border-solid border-2 border-gray-500 rounded-3xl" >
+                        <div className="flex flex-col justify-center items-center">
                                 <img
-                                    src={details.avatar?.secure_url || 'default-avatar-url.jpg'}
+                                    src={details.avatar?.secure_url}
                                     alt="User Avatar"
-                                    className="rounded-full w-full h-full group-hover:blur-sm transition"
+                                    className=" rounded-full w-52 "
                                 />
-                                <MdOutlineFileUpload
-                                    className="absolute inset-0 m-auto text-6xl text-white opacity-0 group-hover:opacity-100 transition"
-                                    style={{ pointerEvents: 'none' }}
-                                />
-                            </div>
                         </div>
                         <div>
                             <label htmlFor="uname" className="text-2xl">Username : </label>
                             <input 
                                 type="text" 
                                 value={details.username || ''} 
-                                className="input input-bordered w-full max-w-xs hover:cursor-not-allowed" 
-                                
+                                className="input input-bordered w-full max-w-xs " 
+                                readOnly
                             />
                         </div>
                         <div>
                             <label className="text-2xl" htmlFor="name">Name : </label>
                             <input 
                                 type="text" 
-                                value={details.name || ''} 
-                                className="input input-bordered input-info w-full max-w-xs" 
-                                
+                                value={details.name} 
+                                className="input input-bordered w-full max-w-xs " 
+                                readOnly
                             />
                         </div>
                         <div>
@@ -72,11 +64,13 @@ function ProfilePage() {
                             <input 
                                 type="email" 
                                 value={details.email || ''} 
-                                className="input input-bordered input-info w-full max-w-xs" 
-                                
+                                className="input input-bordered w-full max-w-xs " 
+                                readOnly
                             />
                         </div>
-                        <button className="btn btn-outline btn-primary mt-5" type="button">Update Changes</button>
+                        <div className="mt-5">
+                            <Link to="/user/update-profile" className="btn btn-outline btn-primary w-full">Update Profile</Link>
+                        </div>
                     </form>
                 )}
             </div>

@@ -48,7 +48,7 @@ function HomeLayout({ children }){
                     </div>
                     <div className="drawer-side w-0">
                         <label htmlFor="my-drawer" className="drawer-overlay"></label>
-                        <ul className=" menu p-4 w-48 sm:w-80 bg-base-200 text-base-content relative h-fit">
+                        <ul className="gap-4 menu p-4 w-48 sm:w-80 bg-base-200 text-base-content relative h-fit">
                             <li className="w-fit absolute right-2 z-50">
                                 <button onClick={hideDrawer}> 
                                     <AiFillCloseCircle size={24}/>
@@ -71,6 +71,11 @@ function HomeLayout({ children }){
                                 isLoggedIn && (
                                     <li className="flex flex-col gap-4">
                                         <Link to="/user/profile"> Profile </Link>
+                                        <Link to="/blog/all"> All Blogs </Link>
+                                        <Link to="/blogs/myblogs"> My Blogs </Link>
+                                        <Link to="/blogs/create">Create new Blog</Link>
+                                        <Link to="/reset" className="btn btn-outline btn-accent cursor-pointer"> Reset Password </Link>
+                                        <Link to="/change-password" className="btn btn-primary"> Change Password </Link>
                                         <button onClick={handleLogOut} className="btn btn-outline btn-danger px-4 py-1 font-semibold rounded-md w-full mb-2">
                                             LogOut
                                         </button>

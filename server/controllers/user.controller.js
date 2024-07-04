@@ -228,51 +228,52 @@ const changePassword = async(req, res, next) => {
 }
 
 
-const updateUser = async(req, res, next) => {
+const updateUser = async (req, res, next) => {
     const { name } = req.body;
-    const { id } = req.user.id;
+    const id = req.user.id;
 
-    const user = await User.findById(id);
-
-    if(!user){
-        return next(new AppError('User does not exists',400));
-    }
-
-    if(req.name){
-        user.name = name;
-    }
-
-    if(req.file){
-        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-        try{
-            const result = await cloudinary.v2.uploader.upload(req.file.path, {
-                folder : 'blogging_site',
-                width : 250,
-                height : 250,
-                gravity : 'faces',
-                crop : fill
-            }) 
-
-            if(result){
-                user.avatar.public_id = result.public_id;
-                user.avatar.secure_url = result.secure_url;
-
-                fs.rm(`uploads/${req.file.filename}`);
-            }
-
-        }catch(err){
-            return next(new AppError(e || 'File not uploaded, please try again',500) );
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            return next(new AppError('User does not exist', 400));
+        }
+        if (name) {
+            user.name = name;
         }
 
-        user.save();
+        if (req.file) {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+            try {
+                const result = await cloudinary.v2.uploader.upload(req.file.path, {
+                    folder: 'blogging_site',
+                    width: 250,
+                    height: 250,
+                    gravity: 'faces',
+                    crop: 'fill'
+                });
+
+                if (result) {
+                    user.avatar.public_id = result.public_id;
+                    user.avatar.secure_url = result.secure_url;
+
+                    fs.rmSync(`uploads/${req.file.filename}`);
+                }
+            } catch (err) {
+                return next(new AppError(err.message || 'File not uploaded, please try again', 500));
+            }
+        }
+
+        await user.save();
         res.status(200).json({
-            success:true,
-            message:'User details updated successfully'
-        })
+            success: true,
+            message: 'User details updated successfully'
+        });
+    } catch (err) {
+        console.log(err);
+        return next(new AppError(err.message, 500));
     }
+};
 
-
-}
 
 const deleteUser = async (req, res, next) => {
     try {

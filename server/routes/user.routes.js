@@ -16,7 +16,7 @@ router.get('/me', isLoggedIn, getProfile);
 router.post('/reset', forgotPassword);
 router.post('/reset/:resetToken', resetPassword);
 router.post('/change-password', isLoggedIn, changePassword);
-router.put('/update', isLoggedIn, upload.single('avatar'), updateUser);
+router.post('/update', isLoggedIn, upload.single('avatar'), updateUser);
 router.get('/delete-user/:userId', isLoggedIn, authorizedRole('ADMIN'), deleteUser )
 router.post('/add-user', isLoggedIn, authorizedRole('ADMIN'), addNewUser);
 

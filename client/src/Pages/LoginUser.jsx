@@ -46,7 +46,7 @@ function LoginUser(){
         <>
             <HomeLayout>
                 <div className="flex overflow-x-auto items-center justify-center h-[100vh]">
-                    <form nonValidate onSubmit={onLogin} className="flex flex-col justify-center gap-4 rounded-lg p-5 text-white w-96 shadow-md">
+                    <form onSubmit={onLogin} className="flex flex-col justify-center gap-4 rounded-lg p-5 text-white w-96 shadow-md">
                         <h1 className="text-center text-3xl font-bold">Login Page</h1>
                         <div className="flex flex-col gap-1">
                             <label htmlFor="email" className="font-semibold">Email</label>
