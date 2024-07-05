@@ -51,6 +51,7 @@ const register = async(req, res, next) => {
                 fs.rm(`uploads/${req.file.filename}`);
             }
         }catch(err){
+            console.log(err);
             return next(new AppError(err.message || "File not uploaded, please try again",500));
         }
     }
