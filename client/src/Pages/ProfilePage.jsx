@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import axiosInstance from "../Helpers/axiosInstance";
 import HomeLayout from "../Layouts/HomeLayout";
-import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import axiosInstance from "../Helpers/axiosInstance";
+import toast from "react-hot-toast";
+
 
 function ProfilePage() {
     const [detailsFetched, setDetailsFetched] = useState(false);
@@ -20,6 +21,7 @@ function ProfilePage() {
         })
         setDetailsFetched(true);
     }
+    
 
 
 

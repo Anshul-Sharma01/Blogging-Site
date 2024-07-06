@@ -154,7 +154,7 @@ const forgotPassword = async(req, res, next) => {
     const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset/${resetToken}`;
 
     const subject = 'Reset Password';
-    const message = `You can reset your password by clicking <a href=${resetPasswordUrl} target="_blank" > Reset Your Password </a>.\nIf the above link does not work for some reason then copy paste this link in new tab ${resetPasswordUrl}.\nIf you have not requested this, kindly Ignore.`;
+    const message = `You can reset your password by clicking <a href=${resetPasswordUrl} target="_blank" > Reset Your Password </a>.\nIf the above link does not work for some reason then copy paste this link in new tab ${resetPasswordUrl}.\nIf you have not requested this, kindly Ignore.\n The Link will be valid for 15 minutes only`;
     try{
         await sendEmail(email, subject, message);
         res.status(200).json({

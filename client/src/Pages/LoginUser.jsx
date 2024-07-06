@@ -12,10 +12,11 @@ function LoginUser(){
     const navigate = useNavigate();
 
     const [ loginData, setLoginData ] = useState({
-        email : " ",
-        password : " "
+        email : "",
+        password : ""
     })
 
+    
     function handleInput(e){
         const { name, value } = e.target;
         setLoginData({
@@ -23,20 +24,18 @@ function LoginUser(){
         })
     }
 
-    async function onLogin(e){
+    async function onLogin(e) {
         e.preventDefault();
-        if(!loginData.email || !loginData.password){
+        if (!loginData.email || !loginData.password) {
             toast.error("Please fill all the details");
             return;
         }
+        
         const response = await dispatch(Login(loginData));
-        if(response?.payload?.success){
+        if (response?.meta?.requestStatus === 'fulfilled') {
             navigate("/");
-
-            setLoginData({
-                email : "",
-                password : "",
-            })
+        } else {
+            toast.error("Login failed. Please try again.");
         }
     }
 

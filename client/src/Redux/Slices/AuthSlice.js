@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import axiosInstance from "../../Helpers/axiosInstance";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 
 const initialState = {
@@ -47,6 +48,45 @@ export const Logout = createAsyncThunk('/auth/logout', async () => {
     });
     return (await res).data;
 });
+
+export const ResetPasswordThunk = createAsyncThunk("/auth/reset", async(data) => {
+    const res = axiosInstance.post("user/reset",data);
+    await toast.promise(res,{
+        loading : 'Sending Reset Password Link to Your Email',
+        success : (data) => {
+            return data?.data?.message;
+        },
+        error: (err) => err?.response?.data?.message || 'Error , Please try again'
+    });
+    return (await res).data;
+})
+
+export const ResetTokenThunk = createAsyncThunk("/auth/reset-password",async ({ resetToken, password }) => {
+    const res = axiosInstance.post(`user/reset/${resetToken}`, {password});
+    await toast.promise(res,{
+        loading : 'Resetting your password',
+        success : (data) => {
+            return data?.data?.message; 
+        },
+        error : (err) => err?.response?.data?.message || 'Error occurred in resetting your password'
+    });
+    return (await res).data;
+})
+
+
+export const ChangePasswordThunk = createAsyncThunk("/auth/changepassword",async({oldPassword, newPassword}) => {
+    const res = axiosInstance.post("user/change-password", {oldPassword, newPassword});
+    toast.promise(res,{
+        loading : 'Changing your password',
+        success : (data) => {
+            return data?.data?.message;
+        },
+        error : (err) => err?.response?.data?.message || 'Error occurred in changing your password'
+    });
+    return (await res).data;
+})
+
+
 
 const authSlice = createSlice({
     name : 'auth',
