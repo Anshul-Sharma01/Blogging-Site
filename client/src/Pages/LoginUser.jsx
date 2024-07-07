@@ -69,6 +69,7 @@ function LoginUser(){
                             Login
                         </button>
                         <p>Don't have an account ? <Link to="/signup" className="link text-accent cursor-pointer">Create new Account</Link></p>
+                        <p><Link to="/reset" className="link text-accent cursor-pointer">Forgot Password ?</Link></p>
                     </form>
                 </div>
             </HomeLayout>
