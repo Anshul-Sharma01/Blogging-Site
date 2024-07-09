@@ -62,8 +62,16 @@ function HomeLayout({ children }){
                                             <Link to="/login"> LogIn </Link>
                                         </button>
                                         <button className="btn btn-outline btn-secondary px-4 py-1 font-semibold rounded-md w-full mb-2">
-                                            <Link to="/signup"> SingUp</Link>
+                                            <Link to="/signup"> SignUp</Link>
                                         </button>
+                                    </li>
+                                )
+                            }
+                            {
+                                isLoggedIn && role === 'USER' && (
+                                    <li className="flex flex-col gap-4">
+                                        <Link to='/adduser'>Add User</Link>
+                                        <Link to='/deleteuser'>Delete User</Link>
                                     </li>
                                 )
                             }

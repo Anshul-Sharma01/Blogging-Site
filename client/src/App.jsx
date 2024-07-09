@@ -6,6 +6,7 @@ import Signup from "./Pages/Signup.jsx"
 import ResetPassword from "./Pages/ResetPassword.jsx"
 import ResetToken from "./Pages/ResetToken.jsx"
 import ChangePassword from "./Pages/ChangePassword.jsx"
+import AddUser from "./AdminPages/AddUser.jsx"
 
 function App() {
   
@@ -20,6 +21,7 @@ function App() {
         <Route path="/reset/:resetToken" element={<ResetToken/>}/>
         <Route path="/change-password" element={<ChangePassword/>}/>
         <Route path="/user/profile" element={<ProfilePage/>}/>
+        <Route path="/adduser" element={<AddUser/>}/>
       </Routes>
     </>
   )
