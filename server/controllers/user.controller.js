@@ -315,7 +315,63 @@ const deleteUser = async (req, res, next) => {
 
 
 const addNewUser = async(req, res, next) => {
+    const { username, name, email, password } = req.body;
+    if(!username || !name || !email || !password){
+        return next(new AppError('All fields are mandatory', 400));
+    }
 
+    const emailExists = await User.findOne({email});
+    if(emailExists){
+        return next(new AppError('Email already exists',400));
+    }
+    const unameExists = await User.findOne({username});
+    if(unameExists){
+        return next(new AppError('Username already exists', 400));
+    }
+
+    let public_id, secure_url;
+    
+
+    if(req.file){
+        console.log("Profile pic received");
+        try{
+            const result = await cloudinary.v2.uploader.upload(req.file.path, {
+                folder : 'blogging_site',
+                width:250,
+                height:250,
+                gravity:'faces',
+                crop:'fill'
+            })
+
+            if(result){
+                public_id = result.public_id;
+                secure_url = result.secure_url;
+
+                fs.rm(`uploads/${req.file.filename}`);
+            }
+        }catch(err){
+            console.log(err);
+            return next(new AppError(err.message || "File not uploaded, please try again",500));
+        }
+    }
+
+    const user = await User.create({
+        username, name, email, password, avatar: {
+            public_id, secure_url 
+        }
+    });
+
+    if(!user){
+        return next(new AppError("User registration failed, pleae try again", 400));
+    }
+
+    await user.save();
+    user.password = undefined;
+    res.status(201).json({
+        success:true,
+        message:'User registered successfully',
+        user,
+    })
 }
 
 

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { BsPersonCircle } from "react-icons/bs";
-import { createAccount } from "../Redux/Slices/AuthSlice";
+import { addUser } from "../Redux/Slices/AuthSlice";
 import { useDispatch } from "react-redux";
 
 
@@ -76,7 +76,7 @@ function AddUser(){
         formData.append("avatar" ,newUserData.avatar);
         formData.append("role" ,newUserData.role);
 
-        const response = await dispatch(createAccount(formData));
+        const response = await dispatch(addUser(formData));
         if(response?.payload?.success){
             navigate("/");
             toast.succes

@@ -4,12 +4,12 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 
-
 const initialState = {
-    isLoggedIn : localStorage.getItem('isLoggedIn') || false,
-    role : localStorage.getItem('role') || " ",
-    data : localStorage.getItem('data') || {}
-}
+    isLoggedIn:false,
+    role: " ",
+    data:  {},
+    loading: true // Add loading state
+};
 
 
 export const createAccount = createAsyncThunk("/auth/signup", async(data) => {
@@ -20,6 +20,18 @@ export const createAccount = createAsyncThunk("/auth/signup", async(data) => {
             return data?.data?.message;
         },
         error : (err) => err?.response?.data?.message || 'Failed to Create Account, Please Try again..'
+    })
+    return (await res).data;
+})
+
+export const addUser = createAsyncThunk("/auth/admin/adduser", async(data) => {
+    const res = axiosInstance.post('user/adduser', data);
+    await toast.promise(res, {
+        loading : 'Creating new user account',
+        success : (data) => {
+            return data?.data?.message;
+        },
+        error : (err) => err?.response?.data?.message || 'Failed to Add New User, Please try again...'
     })
     return (await res).data;
 })
@@ -87,38 +99,63 @@ export const ChangePasswordThunk = createAsyncThunk("/auth/changepassword",async
 })
 
 
-
 const authSlice = createSlice({
-    name : 'auth',
+    name: 'auth',
     initialState,
-    reducers : {},
-    extraReducers : (builder) => {
-        builder.addCase(Login.fulfilled, (state, action) => {
-            localStorage.setItem('data' , JSON.stringify(action?.payload?.user));
-            localStorage.setItem('isLoggedIn', true);
-            localStorage.setItem('role', action?.payload?.user?.role);
-            state.isLoggedIn = true;
-            state.data = action?.payload?.user;
-            state.role = action?.payload?.role;
-        })
-        .addCase(createAccount.fulfilled, (state,action) => {
-            localStorage.setItem('data',JSON.stringify(action?.payload?.user));
-            localStorage.setItem('isLoggedIn', true);
-            localStorage.setItem('role',action?.payload?.user?.role);
-            state.isLoggedIn = true;
-            state.data = action?.payload?.user;
-            state.role = action?.payload?.user?.role;
-        })
-        .addCase(Logout.fulfilled, (state, action) => {
-            localStorage.clear();
-            state.data = {};
-            state.isLoggedIn = false;
-            state.role = " ";
-        })
-
+    reducers: {
+        setLoading: (state, action) => {
+            state.loading = action.payload;
+        }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(Login.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(Login.fulfilled, (state, action) => {
+                // localStorage.setItem('data', JSON.stringify(action.payload.user));
+                // localStorage.setItem('isLoggedIn', true);
+                // localStorage.setItem('role', action.payload.user.role);
+                state.isLoggedIn = true;
+                state.data = action.payload.user;
+                state.role = action.payload.user.role;
+                state.loading = false;
+            })
+            .addCase(Login.rejected, (state) => {
+                state.loading = false;
+            })
+            .addCase(createAccount.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(createAccount.fulfilled, (state, action) => {
+                // localStorage.setItem('data', JSON.stringify(action.payload.user));
+                // localStorage.setItem('isLoggedIn', true);
+                // localStorage.setItem('role', action.payload.user.role);
+                state.isLoggedIn = true;
+                state.data = action.payload.user;
+                state.role = action.payload.user.role;
+                state.loading = false;
+            })
+            .addCase(createAccount.rejected, (state) => {
+                state.loading = false;
+            })
+            .addCase(Logout.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(Logout.fulfilled, (state) => {
+                localStorage.clear();
+                state.data = {};
+                state.isLoggedIn = false;
+                state.role = " ";
+                state.loading = false;
+            })
+            .addCase(Logout.rejected, (state) => {
+                state.loading = false;
+            });
     }
-})
+});
 
+export const { setLoading } = authSlice.actions;
 
 export default authSlice.reducer;
 

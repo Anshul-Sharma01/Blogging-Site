@@ -68,7 +68,7 @@ function HomeLayout({ children }){
                                 )
                             }
                             {
-                                isLoggedIn && role === 'USER' && (
+                                isLoggedIn && role === 'ADMIN' && (
                                     <li className="flex flex-col gap-4">
                                         <Link to='/adduser'>Add User</Link>
                                         <Link to='/deleteuser'>Delete User</Link>
