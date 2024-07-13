@@ -99,6 +99,21 @@ export const ChangePasswordThunk = createAsyncThunk("/auth/changepassword",async
 })
 
 
+
+export const getAllUsers = createAsyncThunk("/users/getallusers",async() => {
+    const res = axiosInstance.get("user/fetchallusers");
+    toast.promise(res, {
+        loading : 'Fetching all users',
+        success : (data) => {
+            return data?.data?.message
+        },
+        error : (err) => err?.response?.data?.message || 'Error occurred while fetching all users'
+    });
+    return (await res).data;
+})
+
+
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,

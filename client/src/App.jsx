@@ -15,6 +15,7 @@ import axiosInstance from "./Helpers/axiosInstance";
 import { setLoading } from "./Redux/Slices/AuthSlice.js";
 import NotFound from "./Pages/NotFound.jsx";
 import Loader from "./Components/Loader.jsx";
+import DeleteUser from "./AdminPages/DeleteUser.jsx";
 
 function App() {
     const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function App() {
                     <Route path="/user/profile" element={<ProfilePage />} />
                 </Route>
                 <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}>
+                    <Route path="/deleteuser" element={<DeleteUser/>}/>
                     <Route path="/adduser" element={<AddUser />} />
                 </Route>
 

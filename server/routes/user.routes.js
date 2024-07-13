@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import {authorizedRole, isLoggedIn} from '../middlewares/auth.middleware.js';
 import upload from '../middlewares/multer.middleware.js';
-import { register, login, logout, getProfile, forgotPassword, resetPassword, changePassword, updateUser, deleteUser, addNewUser } from '../controllers/user.controller.js';
+import { register, login, logout, getProfile, forgotPassword, resetPassword, changePassword, updateUser, deleteUser, addNewUser, getAllUsers } from '../controllers/user.controller.js';
 
 
 
@@ -19,6 +19,6 @@ router.post('/change-password', isLoggedIn, changePassword);
 router.post('/update', isLoggedIn, upload.single('avatar'), updateUser);
 router.get('/delete-user/:userId', isLoggedIn, authorizedRole('ADMIN'), deleteUser )
 router.post('/add-user', isLoggedIn, authorizedRole('ADMIN'), addNewUser);
-
+router.get("/fetchallusers", isLoggedIn, authorizedRole('ADMIN'), getAllUsers);
 
 export default router;

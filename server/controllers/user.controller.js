@@ -228,6 +228,22 @@ const changePassword = async(req, res, next) => {
     })
 }
 
+const getAllUsers = async(req, res, next) => {
+    try{
+        const allUsers = await User.find({});
+        if(!allUsers){
+            return next(new AppError('No user found'));
+        }
+        return res.status(200).json({
+            success : true,
+            message : "All users fetched",
+            users : allUsers
+        })
+    }catch(err){
+        console.log(`Error occurred in getting all users : ${err.message}`);
+        return next(new AppError(`Error occurred while fetching all users`));
+    }
+}
 
 const updateUser = async (req, res, next) => {
     const { name } = req.body;
@@ -274,7 +290,6 @@ const updateUser = async (req, res, next) => {
         return next(new AppError(err.message, 500));
     }
 };
-
 
 const deleteUser = async (req, res, next) => {
     try {
@@ -386,5 +401,6 @@ export{
     changePassword,
     updateUser,
     deleteUser,
-    addNewUser
+    addNewUser,
+    getAllUsers
 }
