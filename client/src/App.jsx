@@ -14,6 +14,7 @@ import Denied from "./Pages/Denied.jsx";
 import axiosInstance from "./Helpers/axiosInstance";
 import { setLoading } from "./Redux/Slices/AuthSlice.js";
 import NotFound from "./Pages/NotFound.jsx";
+import Loader from "./Components/Loader.jsx";
 
 function App() {
     const dispatch = useDispatch();
@@ -38,7 +39,7 @@ function App() {
     }, [dispatch]);
 
     if (loading) {
-        return <div>Loading...</div>; // Or return a loading spinner/component
+        return <Loader /> // Or return a loading spinner/component
     }
 
     return (
