@@ -317,7 +317,7 @@ const deleteUser = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: 'User and the user blogs are deleted',
+            message: 'User and the user blogs are successfully deleted',
             user: deletedUser,
             blogs: deletedBlogs
         });
@@ -330,8 +330,9 @@ const deleteUser = async (req, res, next) => {
 
 
 const addNewUser = async(req, res, next) => {
-    const { username, name, email, password } = req.body;
+    const { username, name, email, password, role } = req.body;
     if(!username || !name || !email || !password){
+        console.log(username, name, email, password, role);
         return next(new AppError('All fields are mandatory', 400));
     }
 
@@ -371,7 +372,7 @@ const addNewUser = async(req, res, next) => {
     }
 
     const user = await User.create({
-        username, name, email, password, avatar: {
+        username, name, email, password, role, avatar: {
             public_id, secure_url 
         }
     });

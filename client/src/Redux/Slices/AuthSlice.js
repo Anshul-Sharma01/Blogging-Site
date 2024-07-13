@@ -5,9 +5,9 @@ import axios from "axios";
 import { Navigate } from "react-router-dom";
 
 const initialState = {
-    isLoggedIn:false,
-    role: " ",
-    data:  {},
+    isLoggedIn : localStorage.getItem('isLoggedIn') || false,
+    role : localStorage.getItem('role') || " ",
+    data : localStorage.getItem('data') || {},
     loading: true // Add loading state
 };
 
@@ -25,7 +25,13 @@ export const createAccount = createAsyncThunk("/auth/signup", async(data) => {
 })
 
 export const addUser = createAsyncThunk("/auth/admin/adduser", async(data) => {
-    const res = axiosInstance.post('user/adduser', data);
+    console.log(data.email);
+    // for (let [key, value] of data.entries()) {
+    //     console.log("Helllo");
+    //     console.log(key, value);
+    // }
+    console.log("ApiData : ", data);
+    const res = axiosInstance.post('user/add-user', data);
     await toast.promise(res, {
         loading : 'Creating new user account',
         success : (data) => {
@@ -113,6 +119,19 @@ export const getAllUsers = createAsyncThunk("/users/getallusers",async() => {
 })
 
 
+export const deleteUserwithId = createAsyncThunk("/users/delete-user", async({ userId }) => {
+    const res = axiosInstance.get(`user/delete-user/${userId}`);
+    toast.promise(res,{
+        loading : 'Deleting the user',
+        success : (data) => {
+            return data?.data?.message
+        },
+        error : (err) => err?.response?.data?.message || 'Failed to Delete user'
+    });
+    return (await res).data;
+})
+
+
 
 const authSlice = createSlice({
     name: 'auth',
@@ -128,9 +147,9 @@ const authSlice = createSlice({
                 state.loading = true;
             })
             .addCase(Login.fulfilled, (state, action) => {
-                // localStorage.setItem('data', JSON.stringify(action.payload.user));
-                // localStorage.setItem('isLoggedIn', true);
-                // localStorage.setItem('role', action.payload.user.role);
+                localStorage.setItem('data', JSON.stringify(action.payload.user));
+                localStorage.setItem('isLoggedIn', true);
+                localStorage.setItem('role', action.payload.user.role);
                 state.isLoggedIn = true;
                 state.data = action.payload.user;
                 state.role = action.payload.user.role;
@@ -143,9 +162,9 @@ const authSlice = createSlice({
                 state.loading = true;
             })
             .addCase(createAccount.fulfilled, (state, action) => {
-                // localStorage.setItem('data', JSON.stringify(action.payload.user));
-                // localStorage.setItem('isLoggedIn', true);
-                // localStorage.setItem('role', action.payload.user.role);
+                localStorage.setItem('data', JSON.stringify(action.payload.user));
+                localStorage.setItem('isLoggedIn', true);
+                localStorage.setItem('role', action.payload.user.role);
                 state.isLoggedIn = true;
                 state.data = action.payload.user;
                 state.role = action.payload.user.role;

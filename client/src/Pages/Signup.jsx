@@ -79,7 +79,7 @@ function Signup(){
         const response = await dispatch(createAccount(formData));
         if(response?.payload?.success){
             navigate("/");
-            toast.succes
+            // toast.succes
             setSignupData({
                 username : "",
                 name: "",
